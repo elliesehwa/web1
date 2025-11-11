@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테스트</title>
+</head>
+<body>
+    <h1>JavaScript 로드 테스트</h1>
+    <div id="test-result"></div>
+
+    <script src="zodiac.js"></script>
+    <script src="saju.js"></script>
+    <script src="game.js"></script>
+    <script>
+        document.getElementById('test-result').innerHTML = `
+            <p>✅ HTML 로딩 완료</p>
+            <p>zodiac.js 로드: ${typeof getZodiacSign !== 'undefined' ? '✅' : '❌'}</p>
+            <p>saju.js 로드: ${typeof calculateSaju !== 'undefined' ? '✅' : '❌'}</p>
+            <p>game.js 로드: ${typeof playerData !== 'undefined' ? '✅' : '❌'}</p>
+        `;
+    </script>
+</body>
+</html>
