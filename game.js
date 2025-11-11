@@ -14,57 +14,101 @@ let playerData = {
 
 // 초기화
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎮 게임 로딩 시작...');
+
     const startBtn = document.getElementById('start-btn');
     const rollBtn = document.getElementById('roll-btn');
 
-    startBtn.addEventListener('click', initializePlayer);
-    rollBtn.addEventListener('click', rollDice);
+    if (!startBtn) {
+        console.error('❌ start-btn을 찾을 수 없습니다!');
+        return;
+    }
+    if (!rollBtn) {
+        console.error('❌ roll-btn을 찾을 수 없습니다!');
+        return;
+    }
+
+    console.log('✅ 버튼 요소 로드 완료');
+
+    startBtn.addEventListener('click', function() {
+        console.log('🎯 운명 확인하기 버튼 클릭됨!');
+        initializePlayer();
+    });
+
+    rollBtn.addEventListener('click', function() {
+        console.log('🎲 주사위 버튼 클릭됨!');
+        rollDice();
+    });
 
     // 로컬 스토리지에서 최고 점수 불러오기
     playerData.highScore = parseInt(localStorage.getItem('highScore')) || 0;
     updateDisplay();
+
+    console.log('✅ 게임 초기화 완료!');
 });
 
 // 플레이어 초기화
 function initializePlayer() {
-    const birthdate = document.getElementById('birthdate').value;
-    const birthHour = document.getElementById('birth-hour').value;
+    try {
+        console.log('👤 플레이어 초기화 시작...');
 
-    if (!birthdate || !birthHour) {
-        alert('생년월일과 출생 시간을 모두 입력해주세요!');
-        return;
+        const birthdate = document.getElementById('birthdate').value;
+        const birthHour = document.getElementById('birth-hour').value;
+
+        console.log('입력값:', { birthdate, birthHour });
+
+        if (!birthdate || !birthHour) {
+            alert('생년월일과 출생 시간을 모두 입력해주세요!');
+            console.warn('⚠️ 입력값이 없습니다');
+            return;
+        }
+
+        const date = new Date(birthdate);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+
+        console.log('날짜 파싱:', { year, month, day, birthHour });
+
+        // 별자리 계산
+        console.log('🌟 별자리 계산 중...');
+        playerData.zodiacSign = getZodiacSign(month, day);
+        console.log('별자리:', playerData.zodiacSign.name);
+
+        // 사주 계산
+        console.log('🔮 사주 계산 중...');
+        playerData.saju = calculateSaju(year, month, day, birthHour);
+        console.log('사주:', playerData.saju);
+
+        // 일일 운세 계산
+        console.log('📅 일일 운세 계산 중...');
+        playerData.dailyFortune = calculateDailyFortune(playerData.saju);
+        console.log('운세:', playerData.dailyFortune);
+
+        // 기본 스탯 저장
+        playerData.baseStats = { ...playerData.zodiacSign.stats };
+
+        // UI 업데이트
+        console.log('🖼️ UI 업데이트 중...');
+        displayZodiacInfo(playerData.zodiacSign);
+        displayStats(playerData.baseStats);
+        displaySajuInfo(playerData.saju, playerData.dailyFortune);
+        displayDailyFortuneInGame(playerData.dailyFortune);
+
+        // 섹션 표시
+        console.log('📱 섹션 전환 중...');
+        document.getElementById('birth-input-section').classList.add('hidden');
+        document.getElementById('fortune-section').classList.remove('hidden');
+        document.getElementById('game-section').classList.remove('hidden');
+
+        // 게임 시작 메시지
+        showMessage(`${playerData.zodiacSign.emoji} ${playerData.zodiacSign.name}의 힘으로 게임을 시작합니다!`, 'success');
+
+        console.log('✅ 플레이어 초기화 완료!');
+    } catch (error) {
+        console.error('❌ 초기화 중 오류 발생:', error);
+        alert('게임 초기화 중 오류가 발생했습니다. 콘솔을 확인해주세요.');
     }
-
-    const date = new Date(birthdate);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-
-    // 별자리 계산
-    playerData.zodiacSign = getZodiacSign(month, day);
-
-    // 사주 계산
-    playerData.saju = calculateSaju(year, month, day, birthHour);
-
-    // 일일 운세 계산
-    playerData.dailyFortune = calculateDailyFortune(playerData.saju);
-
-    // 기본 스탯 저장
-    playerData.baseStats = { ...playerData.zodiacSign.stats };
-
-    // UI 업데이트
-    displayZodiacInfo(playerData.zodiacSign);
-    displayStats(playerData.baseStats);
-    displaySajuInfo(playerData.saju, playerData.dailyFortune);
-    displayDailyFortuneInGame(playerData.dailyFortune);
-
-    // 섹션 표시
-    document.getElementById('birth-input-section').classList.add('hidden');
-    document.getElementById('fortune-section').classList.remove('hidden');
-    document.getElementById('game-section').classList.remove('hidden');
-
-    // 게임 시작 메시지
-    showMessage(`${playerData.zodiacSign.emoji} ${playerData.zodiacSign.name}의 힘으로 게임을 시작합니다!`, 'success');
 }
 
 // 주사위 굴리기

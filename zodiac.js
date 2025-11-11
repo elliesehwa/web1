@@ -1,4 +1,5 @@
 // 별자리 시스템 - 기본 성향과 능력치를 결정
+console.log('⭐ zodiac.js 로드됨');
 
 const ZODIAC_SIGNS = {
     '양자리': {
